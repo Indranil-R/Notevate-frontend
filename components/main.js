@@ -1,16 +1,19 @@
 import Link from "next/link";
-import React from "react";
 import { FaChevronRight, FaPlus, FaSearch } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
 
-const items = [
-    { name: "Item 1", href: "/note/note1" },
-    { name: "Item 2", href: "/note/note2" },
-    { name: "Item 3", href: "/note/note3" },
-  ];
 const Main = () => {
+  const [note, setNote] = useState(null);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/notes`)
+      .then((response) => response.json())
+      .then((data) => setNote(data));
+    console.log(note);
+  }, []);
 
   return (
-    <main class="bg-gray-50  mx-2 md:mx-20 my-2 md:my-4  h-full shadow-xl rounded-lg overflow-hidden">
+    <main class="bg-gray-50  mx-2 md:mx-20 my-2 md:my-4 shadow-xl rounded-lg overflow-hidden h-[calc(100vh-6rem)] flex  flex-col">
       <div className="h-16 bg-gray-100 flex justify-between items-center px-8 shadow-md space-x-2">
         <div className="relative flex items-center justify-center w-11/12 mx-auto">
           <input
@@ -25,20 +28,24 @@ const Main = () => {
           <span className="hidden md:inline">New</span>
         </button>
       </div>
-      <ul class="px-4 py-2 mt-2 rounded-lg space-y-2">
-      {items.map((item, index) => (
-    <li
-      key={index}
-      className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full text-white hover:bg-gray-50 hover:text-gray-800 transition duration-300 ease-in-out"
-    >
-      <Link href={item.href} className="font-medium">
-        {item.name}
-      </Link>
-      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200">
-        <FaChevronRight className="text-gray-800" />
-      </div>
-    </li>
-  ))}
+      <ul class="px-4 py-2 mt-2 rounded-lg space-y-2 ">
+        {note &&
+          note.data.map((note, index) => (
+            <li
+              key={index}
+              className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full text-white hover:bg-gray-50 hover:text-gray-800 transition duration-300 ease-in-out"
+            >
+              <Link
+                href={`note/${note.attributes.slug}`}
+                className="font-medium"
+              >
+                {note.attributes.title}
+              </Link>
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200">
+                <FaChevronRight className="text-gray-800" />
+              </div>
+            </li>
+          ))}
       </ul>
     </main>
   );
